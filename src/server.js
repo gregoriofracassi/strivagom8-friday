@@ -8,23 +8,25 @@ import listEndpoints from "express-list-endpoints"
 import usersRoutes from "./services/users/index.js"
 import accommodationsRoutes from "./services/accomodations/index.js"
 import destinationsRoutes from "./services/destinations/index.js"
-import { unAuthorizedHandler, forbiddenHandler, catchAllHandler, error400 } from "./errorHandlers.js"
+import {
+  unAuthorizedHandler,
+  forbiddenHandler,
+  catchAllHandler,
+  error400,
+} from "./errorHandlers.js"
 
 const server = express()
 const port = process.env.PORT || 3001
 
-// MIDDLEWARES
 server.use(cors({ origin: "localhost", credentials: true }))
 server.use(express.json())
 server.use(cookieParser())
 server.use(passport.initialize())
 
-// ROUTES
 server.use("/users", usersRoutes)
 server.use("/accommodations", accommodationsRoutes)
 server.use("/destinations", destinationsRoutes)
 
-// ERROR HANDLERS
 server.use(error400)
 server.use(unAuthorizedHandler)
 server.use(forbiddenHandler)
@@ -32,6 +34,14 @@ server.use(catchAllHandler)
 
 console.table(listEndpoints(server))
 
-mongoose.connect(process.env.MONGO_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
-mongoose.connection.on("connected", () => server.listen(port, () => console.log("Server running on port:", port)))
-mongoose.connection.on("error", err => console.log("Mongo connection error ", err))
+mongoose.connect(process.env.MONGO_CONNECTION, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+})
+mongoose.connection.on("connected", () =>
+  server.listen(port, () => console.log("Server running on port:", port))
+)
+mongoose.connection.on("error", (err) =>
+  console.log("Mongo connection error ", err)
+)
